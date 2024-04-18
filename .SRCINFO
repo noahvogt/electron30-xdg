@@ -1,5 +1,5 @@
-pkgbase = electron30
-	pkgdesc = Build cross platform desktop apps with web technologies
+pkgbase = electron30-xdg
+	pkgdesc = Build cross platform desktop apps with web technologies - patched to support the xdg basedir spec
 	pkgver = 30.0.1
 	pkgrel = 1
 	url = https://electronjs.org
@@ -245,6 +245,7 @@ pkgbase = electron30
 	source = chromium-mirror_third_party_vulkan-deps_vulkan-tools_src::git+https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-Tools.git#commit=733fd2b522918f81f9c4669350dafd066f99c5d5
 	source = chromium-mirror_third_party_vulkan-deps_vulkan-utility-libraries_src::git+https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-Utility-Libraries.git#commit=a4140c5fd47dcf3a030726a60b293db61cfb54a3
 	source = chromium-mirror_third_party_vulkan-deps_vulkan-validation-layers_src::git+https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-ValidationLayers.git#commit=5b8af92af052c83444ac560ff1e28c1c322424ef
+	source = xdg-basedir.patch
 	sha256sums = cf40db276fb33e553947b29166eaab227839d7afdaa049744e7c1c4c428facf2
 	sha256sums = c2bc4e65ed2a4e23528dd10d5c15bf99f880b7bbb789cc720d451b78098a7e12
 	sha256sums = 3bd35dab1ded5d9e1befa10d5c6c4555fe0a76d909fb724ac57d0bf10cb666c1
@@ -411,5 +412,6 @@ pkgbase = electron30
 	sha256sums = aa8bbfcfe4c153bfff99a203d06cf13519423054f745b847855a9df34c5f70fd
 	sha256sums = c90d55dbff2f09ea9fce383ddaa3987b4fca15537467ee4a9297be18a95244d5
 	sha256sums = cb023b113d3413928eb16efc78c02c86800279fdfe8d03648d922c07e714f875
+	sha256sums = a7d9c117e713e8fc68c777fcc046da5dcae7706055d6d1af7555687086ff4266
 
-pkgname = electron30
+pkgname = electron30-xdg

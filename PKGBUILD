@@ -12,8 +12,8 @@ pkgver=30.0.1
 _gcc_patches=124
 pkgrel=1
 _major_ver=${pkgver%%.*}
-pkgname="electron${_major_ver}"
-pkgdesc='Build cross platform desktop apps with web technologies'
+pkgname="electron${_major_ver}-xdg"
+pkgdesc='Build cross platform desktop apps with web technologies - patched to support the xdg basedir spec'
 arch=(x86_64)
 url='https://electronjs.org'
 license=(MIT BSD-3-Clause)
@@ -399,6 +399,13 @@ sha256sums=('cf40db276fb33e553947b29166eaab227839d7afdaa049744e7c1c4c428facf2'
             'c90d55dbff2f09ea9fce383ddaa3987b4fca15537467ee4a9297be18a95244d5'
             'cb023b113d3413928eb16efc78c02c86800279fdfe8d03648d922c07e714f875')
 
+# add custom patches by extending the bash array, as this is both cleaner
+# and easier to maintain
+source=(${source[@]}
+        xdg-basedir.patch)
+sha256sums=(${sha256sums[@]}
+            'a7d9c117e713e8fc68c777fcc046da5dcae7706055d6d1af7555687086ff4266')
+
 # Possible replacements are listed in build/linux/unbundle/replace_gn_files.py
 # Keys are the names in the above script; values are the dependencies in Arch
 # plus any so names that are provided + linked
@@ -433,13 +440,13 @@ _unwanted_bundled_libs=(
 depends+=(${_system_libs[@]})
 
 _update_sources() {
-  python makepkg-source-roller.py update "v$pkgver" "$pkgname"
+  python makepkg-source-roller.py update "v$pkgver" "${pkgname%-*}"
   updpkgsums
 }
 
 prepare() {
-  sed -i "s|@ELECTRON@|${pkgname}|" electron-launcher.sh
-  sed -i "s|@ELECTRON@|${pkgname}|" electron.desktop
+  sed -i "s|@ELECTRON@|${pkgname%-*}|" electron-launcher.sh
+  sed -i "s|@ELECTRON@|${pkgname%-*}|" electron.desktop
   sed -i "s|@ELECTRON_NAME@|Electron ${_major_ver}|" electron.desktop
 
   cp -r chromium-mirror_third_party_depot_tools depot_tools
@@ -448,7 +455,7 @@ prepare() {
 
   echo "Putting together electron sources"
   # Generate gclient gn args file and prepare-electron-source-tree.sh
-  python makepkg-source-roller.py generate electron/DEPS $pkgname
+  python makepkg-source-roller.py generate electron/DEPS ${pkgname%-*}
   rbash prepare-electron-source-tree.sh "$CARCH"
   mv electron src/electron
 
@@ -614,24 +621,24 @@ build() {
 }
 
 package() {
-  install -dm755 "${pkgdir:?}/usr/lib/${pkgname}"
-  bsdtar -xf src/out/Release/dist.zip -C "${pkgdir}/usr/lib/${pkgname}"
+  install -dm755 "${pkgdir:?}/usr/lib/${pkgname%-*}"
+  bsdtar -xf src/out/Release/dist.zip -C "${pkgdir}/usr/lib/${pkgname%-*}"
 
-  chmod u+s "${pkgdir}/usr/lib/${pkgname}/chrome-sandbox"
+  chmod u+s "${pkgdir}/usr/lib/${pkgname%-*}/chrome-sandbox"
 
-  install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
-  for l in "${pkgdir}/usr/lib/${pkgname}"/{LICENSE,LICENSES.chromium.html}; do
+  install -dm755 "${pkgdir}/usr/share/licenses/${pkgname%-*}"
+  for l in "${pkgdir}/usr/lib/${pkgname%-*}"/{LICENSE,LICENSES.chromium.html}; do
     ln -s  \
-      "$(realpath --relative-to="${pkgdir}/usr/share/licenses/${pkgname}" "${l}")" \
-      "${pkgdir}/usr/share/licenses/${pkgname}"
+      "$(realpath --relative-to="${pkgdir}/usr/share/licenses/${pkgname%-*}" "${l}")" \
+      "${pkgdir}/usr/share/licenses/${pkgname%-*}"
   done
 
   install -Dm755 "${srcdir}/electron-launcher.sh" \
-    "${pkgdir}/usr/bin/${pkgname}"
+    "${pkgdir}/usr/bin/${pkgname%-*}"
 
   # Install .desktop and icon file (see default_app-icon.patch)
   install -Dm644 electron.desktop \
-    "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+    "${pkgdir}/usr/share/applications/${pkgname%-*}.desktop"
   install -Dm644 src/electron/default_app/icon.png \
-          "${pkgdir}/usr/share/pixmaps/${pkgname}.png"  # hicolor has no 1024x1024
+          "${pkgdir}/usr/share/pixmaps/${pkgname%-*}.png"  # hicolor has no 1024x1024
 }
